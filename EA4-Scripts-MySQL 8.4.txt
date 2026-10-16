@@ -1,0 +1,340 @@
+﻿-- Script de CREACIÓN - MySQL 8.4 LTS - Red Social Pascualina (EA4)
+-- Ejecutar en MySQL Workbench. Orden: tablas independientes -> dependientes.
+
+
+SET NAMES utf8mb4;
+
+
+CREATE TABLE rol (
+    id_rol INT AUTO_INCREMENT NOT NULL,
+    nombre_rol VARCHAR(30) NOT NULL,
+    sigla_rol CHAR(3) NOT NULL,
+    descripcion_rol VARCHAR(150) NULL,
+    estado_activo BOOLEAN NOT NULL DEFAULT TRUE,
+    CONSTRAINT pk_rol PRIMARY KEY (id_rol),
+    CONSTRAINT uq_rol_nombre_rol UNIQUE (nombre_rol),
+    CONSTRAINT uq_rol_sigla_rol UNIQUE (sigla_rol)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+
+CREATE TABLE tipo_usuario (
+    id_tipo_usuario INT AUTO_INCREMENT NOT NULL,
+    nombre_tipo_usuario VARCHAR(30) NOT NULL,
+    sigla_tipo_usuario CHAR(3) NOT NULL,
+    descripcion_tipo_usuario VARCHAR(150) NULL,
+    estado_activo BOOLEAN NOT NULL DEFAULT TRUE,
+    CONSTRAINT pk_tipo_usuario PRIMARY KEY (id_tipo_usuario),
+    CONSTRAINT uq_tipo_usuario_nombre_tipo_usuario UNIQUE (nombre_tipo_usuario),
+    CONSTRAINT uq_tipo_usuario_sigla_tipo_usuario UNIQUE (sigla_tipo_usuario)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+
+CREATE TABLE usuario (
+    id_usuario BIGINT AUTO_INCREMENT NOT NULL,
+    uuid_usuario CHAR(36) NOT NULL DEFAULT (UUID()),
+    id_rol INT NOT NULL,
+    id_tipo_usuario INT NOT NULL,
+    nombre_usuario VARCHAR(50) NOT NULL,
+    nombres VARCHAR(80) NOT NULL,
+    apellidos VARCHAR(80) NOT NULL,
+    correo_electronico VARCHAR(120) NOT NULL,
+    contrasena_hash VARCHAR(255) NOT NULL,
+    fecha_nacimiento DATE NULL,
+    estado_activo BOOLEAN NOT NULL DEFAULT TRUE,
+    fecha_registro DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT pk_usuario PRIMARY KEY (id_usuario),
+    CONSTRAINT uq_usuario_uuid_usuario UNIQUE (uuid_usuario),
+    CONSTRAINT uq_usuario_nombre_usuario UNIQUE (nombre_usuario),
+    CONSTRAINT uq_usuario_correo_electronico UNIQUE (correo_electronico),
+    CONSTRAINT fk_usuario_rol FOREIGN KEY (id_rol) REFERENCES rol (id_rol) ON DELETE RESTRICT ON UPDATE RESTRICT,
+    CONSTRAINT fk_usuario_tipo_usuario FOREIGN KEY (id_tipo_usuario) REFERENCES tipo_usuario (id_tipo_usuario) ON DELETE RESTRICT ON UPDATE RESTRICT
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+
+CREATE TABLE perfil (
+    id_usuario BIGINT NOT NULL,
+    foto_perfil VARCHAR(2048) NULL,
+    biografia TEXT NULL,
+    programa_academico VARCHAR(100) NULL,
+    semestre_actual INT NULL,
+    datos_perfil JSON NULL,
+    fecha_actualizacion DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT pk_perfil PRIMARY KEY (id_usuario),
+    CONSTRAINT ck_perfil_semestre_actual CHECK (semestre_actual BETWEEN 1 AND 12),
+    CONSTRAINT fk_perfil_usuario FOREIGN KEY (id_usuario) REFERENCES usuario (id_usuario) ON DELETE CASCADE ON UPDATE RESTRICT
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+
+CREATE TABLE categoria_publicacion (
+    id_categoria_publicacion INT AUTO_INCREMENT NOT NULL,
+    nombre_categoria_publicacion VARCHAR(40) NOT NULL,
+    descripcion_categoria_publicacion VARCHAR(150) NULL,
+    estado_activo BOOLEAN NOT NULL DEFAULT TRUE,
+    CONSTRAINT pk_categoria_publicacion PRIMARY KEY (id_categoria_publicacion),
+    CONSTRAINT uq_categoria_publicacion_nombre_categoria_publicacion UNIQUE (nombre_categoria_publicacion)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+
+CREATE TABLE publicacion (
+    id_publicacion BIGINT AUTO_INCREMENT NOT NULL,
+    id_usuario BIGINT NOT NULL,
+    id_categoria_publicacion INT NOT NULL,
+    titulo_publicacion VARCHAR(150) NOT NULL,
+    contenido_texto TEXT NOT NULL,
+    ruta_audio VARCHAR(255) NULL,
+    fecha_publicacion DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    estado_activo BOOLEAN NOT NULL DEFAULT TRUE,
+    CONSTRAINT pk_publicacion PRIMARY KEY (id_publicacion),
+    CONSTRAINT fk_publicacion_usuario FOREIGN KEY (id_usuario) REFERENCES usuario (id_usuario) ON DELETE RESTRICT ON UPDATE RESTRICT,
+    CONSTRAINT fk_publicacion_categoria_publicacion FOREIGN KEY (id_categoria_publicacion) REFERENCES categoria_publicacion (id_categoria_publicacion) ON DELETE RESTRICT ON UPDATE RESTRICT
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+
+CREATE TABLE comentario (
+    id_publicacion BIGINT NOT NULL,
+    nro_comentario INT NOT NULL,
+    id_usuario BIGINT NOT NULL,
+    contenido_comentario TEXT NOT NULL,
+    fecha_comentario DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT pk_comentario PRIMARY KEY (id_publicacion, nro_comentario),
+    CONSTRAINT fk_comentario_publicacion FOREIGN KEY (id_publicacion) REFERENCES publicacion (id_publicacion) ON DELETE CASCADE ON UPDATE RESTRICT,
+    CONSTRAINT fk_comentario_usuario FOREIGN KEY (id_usuario) REFERENCES usuario (id_usuario) ON DELETE RESTRICT ON UPDATE RESTRICT
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+
+CREATE TABLE tipo_reaccion (
+    id_tipo_reaccion INT AUTO_INCREMENT NOT NULL,
+    nombre_tipo_reaccion VARCHAR(40) NOT NULL,
+    descripcion_tipo_reaccion VARCHAR(150) NULL,
+    estado_activo BOOLEAN NOT NULL DEFAULT TRUE,
+    icono_reaccion VARCHAR(50) NULL,
+    CONSTRAINT pk_tipo_reaccion PRIMARY KEY (id_tipo_reaccion),
+    CONSTRAINT uq_tipo_reaccion_nombre_tipo_reaccion UNIQUE (nombre_tipo_reaccion)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+
+CREATE TABLE reaccion (
+    id_publicacion BIGINT NOT NULL,
+    id_usuario BIGINT NOT NULL,
+    id_tipo_reaccion INT NOT NULL,
+    fecha_reaccion DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT pk_reaccion PRIMARY KEY (id_publicacion, id_usuario),
+    CONSTRAINT fk_reaccion_publicacion FOREIGN KEY (id_publicacion) REFERENCES publicacion (id_publicacion) ON DELETE CASCADE ON UPDATE RESTRICT,
+    CONSTRAINT fk_reaccion_usuario FOREIGN KEY (id_usuario) REFERENCES usuario (id_usuario) ON DELETE CASCADE ON UPDATE RESTRICT,
+    CONSTRAINT fk_reaccion_tipo_reaccion FOREIGN KEY (id_tipo_reaccion) REFERENCES tipo_reaccion (id_tipo_reaccion) ON DELETE RESTRICT ON UPDATE RESTRICT
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+
+CREATE TABLE multimedia (
+    id_publicacion BIGINT NOT NULL,
+    nro_multimedia INT NOT NULL,
+    tipo_archivo ENUM('imagen','documento','video','audio') NOT NULL,
+    url_archivo VARCHAR(2048) NOT NULL,
+    nombre_archivo VARCHAR(150) NULL,
+    fecha_carga DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT pk_multimedia PRIMARY KEY (id_publicacion, nro_multimedia),
+    CONSTRAINT fk_multimedia_publicacion FOREIGN KEY (id_publicacion) REFERENCES publicacion (id_publicacion) ON DELETE CASCADE ON UPDATE RESTRICT
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+
+CREATE TABLE tipo_grupo (
+    id_tipo_grupo INT AUTO_INCREMENT NOT NULL,
+    nombre_tipo_grupo VARCHAR(40) NOT NULL,
+    descripcion_tipo_grupo VARCHAR(150) NULL,
+    estado_activo BOOLEAN NOT NULL DEFAULT TRUE,
+    CONSTRAINT pk_tipo_grupo PRIMARY KEY (id_tipo_grupo),
+    CONSTRAINT uq_tipo_grupo_nombre_tipo_grupo UNIQUE (nombre_tipo_grupo)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+
+CREATE TABLE grupo (
+    id_grupo BIGINT AUTO_INCREMENT NOT NULL,
+    id_usuario_creador BIGINT NOT NULL,
+    id_tipo_grupo INT NOT NULL,
+    nombre_grupo VARCHAR(100) NOT NULL,
+    descripcion_grupo TEXT NULL,
+    imagen_portada VARCHAR(255) NULL,
+    fecha_creacion DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    estado_activo BOOLEAN NOT NULL DEFAULT TRUE,
+    CONSTRAINT pk_grupo PRIMARY KEY (id_grupo),
+    CONSTRAINT uq_grupo_nombre_grupo UNIQUE (nombre_grupo),
+    CONSTRAINT fk_grupo_usuario FOREIGN KEY (id_usuario_creador) REFERENCES usuario (id_usuario) ON DELETE RESTRICT ON UPDATE RESTRICT,
+    CONSTRAINT fk_grupo_tipo_grupo FOREIGN KEY (id_tipo_grupo) REFERENCES tipo_grupo (id_tipo_grupo) ON DELETE RESTRICT ON UPDATE RESTRICT
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+
+CREATE TABLE usuario_grupo (
+    id_usuario BIGINT NOT NULL,
+    id_grupo BIGINT NOT NULL,
+    rol_grupo ENUM('miembro','moderador','administrador') NOT NULL,
+    fecha_union DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    estado_activo BOOLEAN NOT NULL DEFAULT TRUE,
+    CONSTRAINT pk_usuario_grupo PRIMARY KEY (id_usuario, id_grupo),
+    CONSTRAINT fk_usuario_grupo_usuario FOREIGN KEY (id_usuario) REFERENCES usuario (id_usuario) ON DELETE CASCADE ON UPDATE RESTRICT,
+    CONSTRAINT fk_usuario_grupo_grupo FOREIGN KEY (id_grupo) REFERENCES grupo (id_grupo) ON DELETE CASCADE ON UPDATE RESTRICT
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+
+CREATE TABLE tipo_servicio (
+    id_tipo_servicio INT AUTO_INCREMENT NOT NULL,
+    nombre_tipo_servicio VARCHAR(40) NOT NULL,
+    descripcion_tipo_servicio VARCHAR(150) NULL,
+    estado_activo BOOLEAN NOT NULL DEFAULT TRUE,
+    CONSTRAINT pk_tipo_servicio PRIMARY KEY (id_tipo_servicio),
+    CONSTRAINT uq_tipo_servicio_nombre_tipo_servicio UNIQUE (nombre_tipo_servicio)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+
+CREATE TABLE servicio (
+    id_servicio BIGINT AUTO_INCREMENT NOT NULL,
+    id_usuario BIGINT NOT NULL,
+    id_tipo_servicio INT NOT NULL,
+    nombre_servicio VARCHAR(100) NOT NULL,
+    descripcion_servicio TEXT NULL,
+    precio_servicio DECIMAL(12,2) NOT NULL,
+    disponible BOOLEAN NOT NULL DEFAULT TRUE,
+    fecha_publicacion DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT pk_servicio PRIMARY KEY (id_servicio),
+    CONSTRAINT ck_servicio_precio_servicio CHECK (precio_servicio >= 0),
+    CONSTRAINT fk_servicio_usuario FOREIGN KEY (id_usuario) REFERENCES usuario (id_usuario) ON DELETE RESTRICT ON UPDATE RESTRICT,
+    CONSTRAINT fk_servicio_tipo_servicio FOREIGN KEY (id_tipo_servicio) REFERENCES tipo_servicio (id_tipo_servicio) ON DELETE RESTRICT ON UPDATE RESTRICT
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+
+CREATE TABLE tipo_producto (
+    id_tipo_producto INT AUTO_INCREMENT NOT NULL,
+    nombre_tipo_producto VARCHAR(40) NOT NULL,
+    descripcion_tipo_producto VARCHAR(150) NULL,
+    estado_activo BOOLEAN NOT NULL DEFAULT TRUE,
+    CONSTRAINT pk_tipo_producto PRIMARY KEY (id_tipo_producto),
+    CONSTRAINT uq_tipo_producto_nombre_tipo_producto UNIQUE (nombre_tipo_producto)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+
+CREATE TABLE producto (
+    id_producto BIGINT AUTO_INCREMENT NOT NULL,
+    id_usuario BIGINT NOT NULL,
+    id_tipo_producto INT NOT NULL,
+    nombre_producto VARCHAR(100) NOT NULL,
+    descripcion_producto TEXT NULL,
+    precio_producto DECIMAL(12,2) NOT NULL,
+    stock_producto INT NOT NULL,
+    imagen_producto VARCHAR(255) NULL,
+    disponible BOOLEAN NOT NULL DEFAULT TRUE,
+    fecha_publicacion DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT pk_producto PRIMARY KEY (id_producto),
+    CONSTRAINT ck_producto_precio_producto CHECK (precio_producto >= 0),
+    CONSTRAINT ck_producto_stock_producto CHECK (stock_producto >= 0),
+    CONSTRAINT fk_producto_usuario FOREIGN KEY (id_usuario) REFERENCES usuario (id_usuario) ON DELETE RESTRICT ON UPDATE RESTRICT,
+    CONSTRAINT fk_producto_tipo_producto FOREIGN KEY (id_tipo_producto) REFERENCES tipo_producto (id_tipo_producto) ON DELETE RESTRICT ON UPDATE RESTRICT
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+
+CREATE TABLE medio_pago (
+    id_medio_pago INT AUTO_INCREMENT NOT NULL,
+    nombre_medio_pago VARCHAR(40) NOT NULL,
+    sigla_medio_pago CHAR(3) NOT NULL,
+    descripcion_medio_pago VARCHAR(150) NULL,
+    estado_activo BOOLEAN NOT NULL DEFAULT TRUE,
+    CONSTRAINT pk_medio_pago PRIMARY KEY (id_medio_pago),
+    CONSTRAINT uq_medio_pago_nombre_medio_pago UNIQUE (nombre_medio_pago),
+    CONSTRAINT uq_medio_pago_sigla_medio_pago UNIQUE (sigla_medio_pago)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+
+CREATE TABLE transaccion (
+    id_transaccion BIGINT AUTO_INCREMENT NOT NULL,
+    uuid_transaccion CHAR(36) NOT NULL DEFAULT (UUID()),
+    id_usuario_comprador BIGINT NOT NULL,
+    id_medio_pago INT NOT NULL,
+    monto_total DECIMAL(12,2) NOT NULL,
+    estado_transaccion ENUM('pendiente','pagada','cancelada') NOT NULL,
+    fecha_transaccion DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT pk_transaccion PRIMARY KEY (id_transaccion),
+    CONSTRAINT uq_transaccion_uuid_transaccion UNIQUE (uuid_transaccion),
+    CONSTRAINT ck_transaccion_monto_total CHECK (monto_total >= 0),
+    CONSTRAINT fk_transaccion_usuario FOREIGN KEY (id_usuario_comprador) REFERENCES usuario (id_usuario) ON DELETE RESTRICT ON UPDATE RESTRICT,
+    CONSTRAINT fk_transaccion_medio_pago FOREIGN KEY (id_medio_pago) REFERENCES medio_pago (id_medio_pago) ON DELETE RESTRICT ON UPDATE RESTRICT
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+
+CREATE TABLE detalle_transaccion (
+    id_transaccion BIGINT NOT NULL,
+    nro_detalle INT NOT NULL,
+    id_producto BIGINT NULL,
+    id_servicio BIGINT NULL,
+    cantidad INT NOT NULL,
+    precio_unitario DECIMAL(12,2) NOT NULL,
+    CONSTRAINT pk_detalle_transaccion PRIMARY KEY (id_transaccion, nro_detalle),
+    CONSTRAINT ck_detalle_transaccion_cantidad CHECK (cantidad > 0),
+    CONSTRAINT ck_detalle_transaccion_precio_unitario CHECK (precio_unitario >= 0),
+    CONSTRAINT ck_detalle_producto_o_servicio CHECK ((id_producto IS NOT NULL AND id_servicio IS NULL) OR (id_producto IS NULL AND id_servicio IS NOT NULL)),
+    CONSTRAINT fk_detalle_transaccion_transaccion FOREIGN KEY (id_transaccion) REFERENCES transaccion (id_transaccion) ON DELETE CASCADE ON UPDATE RESTRICT,
+    CONSTRAINT fk_detalle_transaccion_producto FOREIGN KEY (id_producto) REFERENCES producto (id_producto) ON DELETE RESTRICT ON UPDATE RESTRICT,
+    CONSTRAINT fk_detalle_transaccion_servicio FOREIGN KEY (id_servicio) REFERENCES servicio (id_servicio) ON DELETE RESTRICT ON UPDATE RESTRICT
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+
+CREATE TABLE tipo_evento (
+    id_tipo_evento INT AUTO_INCREMENT NOT NULL,
+    nombre_tipo_evento VARCHAR(40) NOT NULL,
+    descripcion_tipo_evento VARCHAR(150) NULL,
+    estado_activo BOOLEAN NOT NULL DEFAULT TRUE,
+    CONSTRAINT pk_tipo_evento PRIMARY KEY (id_tipo_evento),
+    CONSTRAINT uq_tipo_evento_nombre_tipo_evento UNIQUE (nombre_tipo_evento)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+
+CREATE TABLE evento (
+    id_evento BIGINT AUTO_INCREMENT NOT NULL,
+    id_usuario_organizador BIGINT NOT NULL,
+    id_tipo_evento INT NOT NULL,
+    nombre_evento VARCHAR(100) NOT NULL,
+    descripcion_evento TEXT NULL,
+    fecha_evento DATE NOT NULL,
+    hora_inicio TIME NOT NULL,
+    hora_fin TIME NULL,
+    lugar_evento VARCHAR(150) NULL,
+    CONSTRAINT pk_evento PRIMARY KEY (id_evento),
+    CONSTRAINT fk_evento_usuario FOREIGN KEY (id_usuario_organizador) REFERENCES usuario (id_usuario) ON DELETE RESTRICT ON UPDATE RESTRICT,
+    CONSTRAINT fk_evento_tipo_evento FOREIGN KEY (id_tipo_evento) REFERENCES tipo_evento (id_tipo_evento) ON DELETE RESTRICT ON UPDATE RESTRICT
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+
+CREATE TABLE usuario_evento (
+    id_usuario BIGINT NOT NULL,
+    id_evento BIGINT NOT NULL,
+    fecha_inscripcion DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    asistio BOOLEAN NOT NULL DEFAULT FALSE,
+    CONSTRAINT pk_usuario_evento PRIMARY KEY (id_usuario, id_evento),
+    CONSTRAINT fk_usuario_evento_usuario FOREIGN KEY (id_usuario) REFERENCES usuario (id_usuario) ON DELETE CASCADE ON UPDATE RESTRICT,
+    CONSTRAINT fk_usuario_evento_evento FOREIGN KEY (id_evento) REFERENCES evento (id_evento) ON DELETE CASCADE ON UPDATE RESTRICT
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+
+CREATE TABLE solicitud_mentoria (
+    id_solicitud_mentoria BIGINT AUTO_INCREMENT NOT NULL,
+    id_usuario_mentor BIGINT NOT NULL,
+    id_usuario_estudiante BIGINT NOT NULL,
+    tema_mentoria VARCHAR(150) NOT NULL,
+    mensaje_solicitud TEXT NULL,
+    estado_solicitud ENUM('pendiente','aceptada','rechazada') NOT NULL,
+    fecha_solicitud DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    fecha_respuesta DATETIME NULL,
+    CONSTRAINT pk_solicitud_mentoria PRIMARY KEY (id_solicitud_mentoria),
+    CONSTRAINT ck_solicitud_mentoria_mentor_distinto CHECK (id_usuario_mentor <> id_usuario_estudiante),
+    CONSTRAINT fk_solicitud_mentoria_usuario_id_usuario_mentor FOREIGN KEY (id_usuario_mentor) REFERENCES usuario (id_usuario) ON DELETE RESTRICT ON UPDATE RESTRICT,
+    CONSTRAINT fk_solicitud_mentoria_usuario_id_usuario_estudiante FOREIGN KEY (id_usuario_estudiante) REFERENCES usuario (id_usuario) ON DELETE RESTRICT ON UPDATE RESTRICT
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+
+CREATE TABLE notificacion (
+    id_usuario BIGINT NOT NULL,
+    nro_notificacion INT NOT NULL,
+    titulo_notificacion VARCHAR(100) NOT NULL,
+    mensaje_notificacion TEXT NOT NULL,
+    estado_leido BOOLEAN NOT NULL DEFAULT FALSE,
+    fecha_notificacion DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT pk_notificacion PRIMARY KEY (id_usuario, nro_notificacion),
+    CONSTRAINT fk_notificacion_usuario FOREIGN KEY (id_usuario) REFERENCES usuario (id_usuario) ON DELETE CASCADE ON UPDATE RESTRICT
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
