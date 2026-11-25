@@ -1,0 +1,422 @@
+﻿-- ============================================================================
+-- 1.1- Poblamiento Directo mediante INSERT INTO (Catálogos Base)
+-- ============================================================================
+
+
+INSERT INTO rol (id_rol, nombre_rol, descripcion_rol) VALUES
+(1, 'Administrador', 'Tiene acceso a todos los elementos de la base de datos de manera irrestricta'),
+(2, 'Auxiliar', 'Tiene acceso al BackOffice de manera limitada'),
+(3, 'Miembro', 'Es miembro de la Red Social. Tiene permiso para hacer publicaciones, generar eventos, vender y comprar productos, vender y consumir servicios; entre otros.'),
+(4, 'Visitante', 'Puede acceder a la Red Social pero no puede interactuar de ninguna forma');
+SELECT setval('rol_id_rol_seq', (SELECT MAX(id_rol) FROM rol));
+
+
+INSERT INTO tipo_usuario (id_tipo_usuario, nombre_tipo_usuario, descripcion_tipo_usuario) VALUES
+(1, 'Estudiante', 'Estudiante activo de pregrado o posgrado'),
+(2, 'Docente', 'Profesor de planta o cátedra de la institución'),
+(3, 'Egresado', 'Graduado de la Institución Universitaria Pascual Bravo'),
+(4, 'Empleado', 'Personal administrativo o operativo'),
+(5, 'Empresario', 'Aliado del sector productivo o emprendedor'),
+(6, 'Ex-Empleado', 'Antiguo colaborador administrativo'),
+(7, 'Ex-Estudiante', 'Antiguo estudiante no graduado'),
+(8, 'Ex-Docente', 'Antiguo profesor de la institución'),
+(9, 'Guess', 'Usuario amigo de la Red Social con algunas limitaciones');
+SELECT setval('tipo_usuario_id_tipo_usuario_seq', (SELECT MAX(id_tipo_usuario) FROM tipo_usuario));
+
+
+INSERT INTO tipo_servicio (id_tipo_servicio, nombre_tipo_servicio) VALUES
+(1, 'Asesoría académica'),
+(2, 'Asesoría Laboral'),
+(3, 'Curso Tecnológico'),
+(4, 'Mantenimiento Moto'),
+(5, 'Reparación artículo electrónico'),
+(6, 'Corte de Cabello'),
+(7, 'Manicure y Pedicure'),
+(8, 'Reparación PC'),
+(9, 'Masaje terapéutico'),
+(10, 'Declaración de impuestos'),
+(11, 'Asesoría Trabajo de Grado'),
+(12, 'Viaje turístico'),
+(13, 'Transporte'),
+(14, 'Elaboración de Dulces'),
+(15, 'Reparación de Calzado'),
+(16, 'Confección vestimenta'),
+(17, 'Organización evento'),
+(18, 'Diseño Gráfico y Multimedia'),
+(19, 'Desarrollo Web y Móvil'),
+(20, 'Tutoría de Idiomas');
+SELECT setval('tipo_servicio_id_tipo_servicio_seq', (SELECT MAX(id_tipo_servicio) FROM tipo_servicio));
+
+
+INSERT INTO tipo_producto (id_tipo_producto, nombre_tipo_producto) VALUES
+(1, 'Libro'),
+(2, 'Motocicleta'),
+(3, 'Vehículo'),
+(4, 'Almuerzo'),
+(5, 'Desayuno'),
+(6, 'Ropa'),
+(7, 'Cosméticos'),
+(8, 'Ticket de Concierto'),
+(9, 'Bolso'),
+(10, 'Zapato'),
+(11, 'Postres'),
+(12, 'Dulces'),
+(13, 'Patineta Eléctrica'),
+(14, 'Teléfono móvil'),
+(15, 'Computador'),
+(16, 'Artículo Deportivo'),
+(17, 'Alimentos'),
+(18, 'Componentes Electrónicos'),
+(19, 'Papelería y Útiles'),
+(20, 'Accesorios Tecnológicos');
+SELECT setval('tipo_producto_id_tipo_producto_seq', (SELECT MAX(id_tipo_producto) FROM tipo_producto));
+
+
+INSERT INTO tipo_evento (id_tipo_evento, nombre_tipo_evento) VALUES
+(1, 'Congreso'),
+(2, 'Conferencia'),
+(3, 'Taller'),
+(4, 'Baile'),
+(5, 'Fiesta'),
+(6, 'Conformación de Grupo'),
+(7, 'Viaje Turístico'),
+(8, 'Concierto musical'),
+(9, 'Reunión Semillero'),
+(10, 'Feria de comida'),
+(11, 'Feria de ropa'),
+(12, 'Paseo en moto'),
+(13, 'Feria Tecnológica'),
+(14, 'Cine - Película'),
+(15, 'Reunión grupo interés'),
+(16, 'Entrevista laboral'),
+(17, 'Matrimonio'),
+(18, 'Hackatón'),
+(19, 'Torneo Deportivo'),
+(20, 'Muestra Empresarial');
+SELECT setval('tipo_evento_id_tipo_evento_seq', (SELECT MAX(id_tipo_evento) FROM tipo_evento));
+
+
+INSERT INTO categoria_publicacion (id_categoria_publicacion, nombre_categoria) VALUES
+(1, 'Académico y Tareas'),
+(2, 'Noticias Tecnológicas'),
+(3, 'Vida Universitaria y Memes'),
+(4, 'Ofertas y Emprendimiento'),
+(5, 'Deportes y Cultura'),
+(6, 'Investigación y Semilleros');
+SELECT setval('categoria_publicacion_id_categoria_publicacion_seq', 6);
+
+
+INSERT INTO medio_pago (id_medio_pago, nombre_medio_pago) VALUES
+(1, 'Efectivo'),
+(2, 'Transferencia Nequi'),
+(3, 'Transferencia Bancolombia'),
+(4, 'Daviplata'),
+(5, 'Tarjeta Débito/Crédito'),
+(6, 'PSE');
+SELECT setval('medio_pago_id_medio_pago_seq', 6);
+
+
+INSERT INTO tipo_grupo (id_tipo_grupo, nombre_tipo_grupo) VALUES
+(1, 'Semillero de Investigación'),
+(2, 'Grupo de Estudio'),
+(3, 'Club Deportivo'),
+(4, 'Comunidad Tecnológica'),
+(5, 'Emprendimiento e Innovación'),
+(6, 'Cultura y Arte');
+SELECT setval('tipo_grupo_id_tipo_grupo_seq', 6);
+
+
+INSERT INTO tipo_reaccion (id_tipo_reaccion, nombre_reaccion) VALUES
+(1, 'Me gusta'),
+(2, 'Me encanta'),
+(3, 'Me divierte'),
+(4, 'Me interesa'),
+(5, 'Aplausos');
+SELECT setval('tipo_reaccion_id_tipo_reaccion_seq', 5);
+
+
+
+
+-- ============================================================================
+-- 1.2- Poblamiento Masivo Automatizado (Generadores Aleatorios)
+-- ============================================================================
+
+
+-- 1. Usuarios (100 registros)
+INSERT INTO usuario (id_rol, id_tipo_usuario, nombre_usuario, correo_electronico, contrasena_hash, fecha_registro, telefono_contacto)
+SELECT 
+    CASE 
+        WHEN g <= 2 THEN 1
+        WHEN g <= 5 THEN 2
+        WHEN g <= 90 THEN 3
+        ELSE 4
+    END AS id_rol,
+    ((g - 1) % 9) + 1 AS id_tipo_usuario,
+    (ARRAY['camila','juan','mateo','valentina','santiago','sofia','daniel','laura','andres','paula','carlos','natalia','felipe','mariana','david','juliana'])[1 + floor(random()*16)::int] 
+        || '_' || 
+    (ARRAY['gomez','rodriguez','lopez','martinez','garcia','perez','sanchez','ramirez','torres','flores','diaz','vargas','castro','ruiz','ortiz','morales'])[1 + floor(random()*16)::int] 
+        || '_' || g AS nombre_usuario,
+    'usuario' || g || '@pascualbravo.edu.co' AS correo_electronico,
+    md5('Pascual2026*' || g) AS contrasena_hash,
+    CURRENT_TIMESTAMP - (random() * interval '365 days') AS fecha_registro,
+    '3' || lpad(floor(random()*999999999)::text, 9, '0') AS telefono_contacto
+FROM generate_series(1, 100) AS g;
+
+
+-- 2. Perfiles (100 registros con JSONB)
+INSERT INTO perfil (id_usuario, datos_perfil, fecha_actualizacion)
+SELECT 
+    u.id_usuario,
+    jsonb_build_object(
+        'programa_academico', (ARRAY['Ingeniería de Software','Ingeniería Mecánica','Ingeniería Eléctrica','Tecnología en Desarrollo de Software','Diseño Gráfico','Gestión Administrativa'])[1 + floor(random()*6)::int],
+        'semestre', 1 + floor(random()*10)::int,
+        'intereses', jsonb_build_array(
+            (ARRAY['Bases de Datos','Inteligencia Artificial','Robótica','Desarrollo Web','Ciberseguridad'])[1 + floor(random()*5)::int],
+            (ARRAY['Fútbol','Videojuegos','Música','Senderismo','Fotografía'])[1 + floor(random()*5)::int]
+        ),
+        'habilidades', jsonb_build_array('SQL', 'Python', 'Trabajo en equipo'),
+        'disponible_mentoria', (random() > 0.5)
+    ),
+    u.fecha_registro + interval '1 hour'
+FROM usuario u;
+
+
+-- 3. Grupos (25 registros)
+INSERT INTO grupo (id_usuario_creador, id_tipo_grupo, nombre_grupo, descripcion_grupo, fecha_creacion)
+SELECT 
+    (SELECT id_usuario FROM usuario WHERE id_rol = 3 ORDER BY random() LIMIT 1),
+    (SELECT id_tipo_grupo FROM tipo_grupo ORDER BY random() LIMIT 1),
+    'Comunidad ' || (ARRAY['DevPascual','RoboTech','DataScience PB','Software Libre','Innovadores','CiberSeguridad','Deportes PB','Emprende Ya'])[1 + floor(random()*8)::int] || ' #' || g,
+    'Espacio colaborativo para compartir conocimiento, proyectos y actividades en el campus.',
+    CURRENT_TIMESTAMP - (random() * interval '200 days')
+FROM generate_series(1, 25) AS g;
+
+
+-- 4. Publicaciones (300 registros)
+INSERT INTO publicacion (id_usuario, id_categoria_publicacion, contenido_texto, fecha_publicacion)
+SELECT 
+    (SELECT id_usuario FROM usuario WHERE id_rol IN (1,2,3) ORDER BY random() LIMIT 1),
+    (SELECT id_categoria_publicacion FROM categoria_publicacion ORDER BY random() LIMIT 1),
+    (ARRAY[
+        '¿Alguien tiene apuntes de normalización y álgebra relacional para el parcial de Base de Datos I?',
+        'Comparto este repositorio con ejercicios resueltos de SQL en PostgreSQL, muy útil para el proyecto.',
+        '¡Gran participación de nuestro semillero en la feria tecnológica de hoy en el bloque 5!',
+        'Recuerden que mañana hay jornada de inducción para nuevos integrantes del club de programación.',
+        'Cuando corres un UPDATE sin WHERE en producción y te quedas mirando la pantalla...',
+        'Busco compañeros para armar equipo para la próxima hackatón institucional.'
+    ])[1 + floor(random()*6)::int] || ' (Ref #' || g || ')',
+    CURRENT_TIMESTAMP - (random() * interval '180 days')
+FROM generate_series(1, 300) AS g;
+
+
+-- 5. Multimedia (150 registros)
+INSERT INTO multimedia (id_publicacion, tipo_archivo, url_archivo)
+SELECT 
+    (SELECT id_publicacion FROM publicacion ORDER BY random() LIMIT 1),
+    (ARRAY['IMAGEN','PDF','VIDEO','ENLACE'])[1 + floor(random()*4)::int],
+    'https://cdn.pascualbravo.edu.co/rsp/media/archivo_' || g || (ARRAY['.jpg','.pdf','.mp4','.png'])[1 + floor(random()*4)::int]
+FROM generate_series(1, 150) AS g;
+
+
+-- 6. Comentarios (600 registros)
+INSERT INTO comentario (id_publicacion, id_usuario, contenido_texto, fecha_comentario)
+SELECT 
+    p.id_publicacion,
+    (SELECT id_usuario FROM usuario WHERE id_rol IN (1,2,3) AND id_usuario <> p.id_usuario ORDER BY random() LIMIT 1),
+    (ARRAY[
+        '¡Excelente aporte, muchas gracias por compartir!',
+        'Yo tengo el material de la última clase, escríbeme y te lo paso.',
+        'Totalmente de acuerdo, nos vemos allá.',
+        'Me interesa participar, ¿dónde me inscribo?',
+        'Buenísimo, justo lo que estaba buscando para estudiar.'
+    ])[1 + floor(random()*5)::int],
+    p.fecha_publicacion + (random() * interval '10 days')
+FROM (
+    SELECT id_publicacion, id_usuario, fecha_publicacion 
+    FROM publicacion 
+    ORDER BY random() 
+    LIMIT 300
+) p
+CROSS JOIN generate_series(1, 2);
+
+
+-- 7. Reacciones (hasta 800 registros únicos)
+INSERT INTO reaccion (id_publicacion, id_usuario, id_tipo_reaccion, fecha_reaccion)
+SELECT DISTINCT ON (pub_id, usr_id)
+    pub_id,
+    usr_id,
+    (SELECT id_tipo_reaccion FROM tipo_reaccion ORDER BY random() LIMIT 1),
+    CURRENT_TIMESTAMP - (random() * interval '90 days')
+FROM (
+    SELECT 
+        (SELECT id_publicacion FROM publicacion ORDER BY random() LIMIT 1) AS pub_id,
+        (SELECT id_usuario FROM usuario WHERE id_rol IN (1,2,3) ORDER BY random() LIMIT 1) AS usr_id
+    FROM generate_series(1, 1200)
+) sub
+LIMIT 800
+ON CONFLICT DO NOTHING;
+
+
+-- 8. Servicios (80 registros)
+INSERT INTO servicio (id_usuario_oferente, id_tipo_servicio, descripcion_servicio, precio_servicio)
+SELECT 
+    (SELECT id_usuario FROM usuario WHERE id_rol = 3 ORDER BY random() LIMIT 1),
+    (SELECT id_tipo_servicio FROM tipo_servicio ORDER BY random() LIMIT 1),
+    'Servicio universitario garantizado con atención personalizada en el campus o virtual. Código #' || g,
+    (10 + floor(random()*90)) * 1000
+FROM generate_series(1, 80) AS g;
+
+
+-- 9. Productos (120 registros)
+INSERT INTO producto (id_usuario_vendedor, id_tipo_producto, nombre_producto, precio_producto)
+SELECT 
+    (SELECT id_usuario FROM usuario WHERE id_rol = 3 ORDER BY random() LIMIT 1),
+    (SELECT id_tipo_producto FROM tipo_producto ORDER BY random() LIMIT 1),
+    (ARRAY['Calculadora Científica','Libro Fundamentos de BD','Almuerzo Ejecutivo','Mouse Inalámbrico','Sudadera Institucional','Brownie Casero','Audífonos Bluetooth','Arduino Uno Kit','Termo Metálico','Cuaderno Argollado'])[1 + floor(random()*10)::int] || ' - Lote ' || g,
+    (5 + floor(random()*150)) * 1000
+FROM generate_series(1, 120) AS g;
+
+
+-- 10. Eventos (40 registros)
+INSERT INTO evento (id_usuario_organizador, id_tipo_evento, nombre_evento, descripcion_evento, fecha_evento, ubicacion_evento)
+SELECT 
+    (SELECT id_usuario FROM usuario WHERE id_rol IN (1,2,3) ORDER BY random() LIMIT 1),
+    (SELECT id_tipo_evento FROM tipo_evento ORDER BY random() LIMIT 1),
+    (ARRAY['Encuentro Académico','Taller Práctico','Jornada Cultural','Seminario de Innovación','Feria Universitaria','Integración Estudiantil'])[1 + floor(random()*6)::int] || ' Pascualina #' || g,
+    'Actividad abierta para toda la comunidad académica de la Institución Universitaria Pascual Bravo.',
+    CURRENT_TIMESTAMP + ((g - 20) * interval '3 days'),
+    (ARRAY['Auditorio Bloque 1','Plazoleta Central','Laboratorio de Sistemas','Cancha Sintética','Sala de Conferencias B3'])[1 + floor(random()*5)::int]
+FROM generate_series(1, 40) AS g;
+
+
+-- 11. Patrocinio de Eventos (15 registros)
+INSERT INTO patrocinio_evento (nombre_campana, presupuesto_campana, codigo_patrocinio, fecha_inicio, cantidad_stands)
+SELECT 
+    'Campaña Impulso Pascual #' || g,
+    (100 + floor(random()*900)) * 1000,
+    'PAT-PB-2026-' || lpad(g::text, 3, '0'),
+    CURRENT_TIMESTAMP - (random() * interval '60 days'),
+    1 + floor(random()*10)::int
+FROM generate_series(1, 15) AS g;
+
+
+-- 12. Usuario_Grupo (hasta 250 registros únicos)
+INSERT INTO usuario_grupo (id_usuario, id_grupo, fecha_ingreso)
+SELECT DISTINCT ON (usr_id, grp_id)
+    usr_id,
+    grp_id,
+    CURRENT_TIMESTAMP - (random() * interval '150 days')
+FROM (
+    SELECT 
+        (SELECT id_usuario FROM usuario WHERE id_rol = 3 ORDER BY random() LIMIT 1) AS usr_id,
+        (SELECT id_grupo FROM grupo ORDER BY random() LIMIT 1) AS grp_id
+    FROM generate_series(1, 400)
+) sub
+LIMIT 250
+ON CONFLICT DO NOTHING;
+
+
+-- 13. Usuario_Evento (hasta 300 registros únicos)
+INSERT INTO usuario_evento (id_usuario, id_evento, fecha_inscripcion)
+SELECT DISTINCT ON (usr_id, evt_id)
+    usr_id,
+    evt_id,
+    CURRENT_TIMESTAMP - (random() * interval '30 days')
+FROM (
+    SELECT 
+        u.id_usuario AS usr_id,
+        e.id_evento AS evt_id
+    FROM usuario u
+    CROSS JOIN evento e
+    WHERE u.id_rol = 3 AND u.id_usuario <> e.id_usuario_organizador
+    ORDER BY random()
+    LIMIT 300
+) sub
+ON CONFLICT DO NOTHING;
+
+
+-- 14. Solicitud de Mentoría (60 registros)
+INSERT INTO solicitud_mentoria (id_usuario_estudiante, id_usuario_mentor, materia_tema, estado_solicitud, fecha_solicitud)
+SELECT 
+    (SELECT id_usuario FROM usuario WHERE id_tipo_usuario = 1 ORDER BY random() LIMIT 1),
+    (SELECT id_usuario FROM usuario WHERE id_tipo_usuario IN (2,3) ORDER BY random() LIMIT 1),
+    (ARRAY['Base de Datos I','Cálculo Diferencial','Programación Orientada a Objetos','Estructuras de Datos','Física Mecánica','Formulación de Proyectos'])[1 + floor(random()*6)::int],
+    (ARRAY['PENDIENTE','ACEPTADA','FINALIZADA','RECHAZADA'])[1 + floor(random()*4)::int],
+    CURRENT_TIMESTAMP - (random() * interval '45 days')
+FROM generate_series(1, 60) AS g;
+
+
+-- 15. Transacciones y Detalle de Transacción (100 registros protegidos contra NULL)
+DO $$
+DECLARE
+    v_id_transaccion BIGINT;
+    v_id_comprador BIGINT;
+    v_id_vendedor BIGINT;
+    v_id_producto BIGINT;
+    v_id_servicio BIGINT;
+    v_precio NUMERIC;
+    v_cantidad INT;
+    i INT;
+BEGIN
+    FOR i IN 1..100 LOOP
+        v_cantidad := 1 + floor(random()*3)::int;
+
+
+        IF (i % 2 = 0) THEN
+            -- Seleccionar primero un producto real
+            SELECT id_producto, id_usuario_vendedor, precio_producto 
+            INTO v_id_producto, v_id_vendedor, v_precio 
+            FROM producto ORDER BY random() LIMIT 1;
+
+
+            -- Seleccionar un comprador distinto al vendedor
+            SELECT id_usuario INTO v_id_comprador 
+            FROM usuario WHERE id_rol = 3 AND id_usuario <> v_id_vendedor ORDER BY random() LIMIT 1;
+            
+            INSERT INTO transaccion (id_usuario_comprador, id_medio_pago, monto_total, fecha_transaccion)
+            VALUES (v_id_comprador, (SELECT id_medio_pago FROM medio_pago ORDER BY random() LIMIT 1), COALESCE(v_precio, 10000) * v_cantidad, CURRENT_TIMESTAMP - (random() * interval '60 days'))
+            RETURNING id_transaccion INTO v_id_transaccion;
+
+
+            INSERT INTO detalle_transaccion (id_transaccion, id_producto, id_servicio, cantidad, precio_unitario)
+            VALUES (v_id_transaccion, v_id_producto, NULL, v_cantidad, COALESCE(v_precio, 10000));
+        ELSE
+            -- Seleccionar primero un servicio real
+            SELECT id_servicio, id_usuario_oferente, precio_servicio 
+            INTO v_id_servicio, v_id_vendedor, v_precio 
+            FROM servicio ORDER BY random() LIMIT 1;
+
+
+            -- Seleccionar un comprador distinto al oferente
+            SELECT id_usuario INTO v_id_comprador 
+            FROM usuario WHERE id_rol = 3 AND id_usuario <> v_id_vendedor ORDER BY random() LIMIT 1;
+            
+            INSERT INTO transaccion (id_usuario_comprador, id_medio_pago, monto_total, fecha_transaccion)
+            VALUES (v_id_comprador, (SELECT id_medio_pago FROM medio_pago ORDER BY random() LIMIT 1), COALESCE(v_precio, 15000) * v_cantidad, CURRENT_TIMESTAMP - (random() * interval '60 days'))
+            RETURNING id_transaccion INTO v_id_transaccion;
+
+
+            INSERT INTO detalle_transaccion (id_transaccion, id_producto, id_servicio, cantidad, precio_unitario)
+            VALUES (v_id_transaccion, NULL, v_id_servicio, v_cantidad, COALESCE(v_precio, 15000));
+        END IF;
+    END LOOP;
+END $$;
+
+
+-- 16. Notificaciones (200 registros)
+INSERT INTO notificacion (id_usuario, contenido_notificacion, estado_leido, fecha_notificacion)
+SELECT 
+    (SELECT id_usuario FROM usuario ORDER BY random() LIMIT 1),
+    (ARRAY[
+        'Alguien ha comentado tu publicación reciente.',
+        'Tienes una nueva reacción en tu aporte académico.',
+        'Tu inscripción al evento ha sido confirmada.',
+        'Has recibido una actualización en tu solicitud de mentoría.',
+        'Se ha registrado una nueva transacción en tu cuenta.'
+    ])[1 + floor(random()*5)::int],
+    (random() > 0.4),
+    CURRENT_TIMESTAMP - (random() * interval '30 days')
+FROM generate_series(1, 200) AS g;
+
+
+COMMIT;
